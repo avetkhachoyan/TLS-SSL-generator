@@ -3,70 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSL Certificate Generator API</title>
+    <title>SSL Certificate Generator</title>
 </head>
 <body>
-    <script>
-        function generateCertificate() {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/generate-certificate", true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        console.log('Certificate:', response.cert);
-                        console.log('Private Key:', response.privateKey);
-                    } else {
-                        console.error('Failed to generate certificate:', xhr.statusText);
-                    }
-                }
-            };
-            xhr.send();
-        }
-    </script>
+    <header>
+        <h1>SSL Certificate Generator</h1>
+    </header>
 
-    <button onclick="generateCertificate()">Generate Certificate</button>
+    <section id="certificateSection">
+        <h2>Generate Certificate</h2>
+        <button id="generateCertificateBtn">Generate Certificate</button>
+        <form id="certificateForm">
+            <label for="commonName">Common Name:</label>
+            <input type="text" id="commonName" name="commonName" required><br>
 
-    <script>
-        // HTTP server setup
-        var http = require('http');
-        var forge = require('node-forge');
+            <label for="countryName">Country Name:</label>
+            <input type="text" id="countryName" name="countryName" required><br>
 
-        var server = http.createServer(function (req, res) {
-            if (req.url === '/generate-certificate' && req.method === 'GET') {
-                var keys = forge.pki.rsa.generateKeyPair({ bits: 2048 });
-                var cert = forge.pki.createCertificate();
-                cert.publicKey = keys.publicKey;
-                cert.serialNumber = '01';
-                cert.validity.notBefore = new Date();
-                cert.validity.notAfter = new Date();
-                cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
-                var attrs = [
-                    { name: 'commonName', value: 'localhost' },
-                    { name: 'countryName', value: 'US' },
-                    { shortName: 'ST', value: 'New York' },
-                    { name: 'localityName', value: 'New York' },
-                    { name: 'organizationName', value: 'Example Org' },
-                    { shortName: 'OU', value: 'Web Development' }
-                ];
-                cert.setSubject(attrs);
-                cert.setIssuer(attrs);
-                cert.sign(keys.privateKey);
+            <label for="localityName">Locality Name:</label>
+            <input type="text" id="localityName" name="localityName" required><br>
 
-                var certPem = forge.pki.certificateToPem(cert);
-                var privateKeyPem = forge.pki.privateKeyToPem(keys.privateKey);
+            <label for="organizationName">Organization Name:</label>
+            <input type="text" id="organizationName" name="organizationName" required><br>
 
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ cert: certPem, privateKey: privateKeyPem }));
-            } else {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end('Not Found');
-            }
-        });
+            <label for="organizationalUnit">Organizational Unit:</label>
+            <input type="text" id="organizationalUnit" name="organizationalUnit" required><br>
 
-        server.listen(8000, 'localhost', function () {
-            console.log('Server running at http://localhost:8000/');
-        });
-    </script>
+            <button type="submit">Generate Certificate</button>
+        </form>
+    </section>
+
+    <section id="qrcodeSection">
+        <h2>SSL Certificate QR Code Generator</h2>
+        <textarea id="certificateText" rows="10" cols="50" placeholder="Enter SSL certificate text"></textarea><br>
+        <button id="generateQRCodeBtn">Generate QR Code</button><br>
+        <div id="qrcode"></div>
+    </section>
+
+    <script src="certificateGenerator.js" defer></script>
+    <script src="qrcodeGenerator.js" defer></script>
 </body>
 </html>
