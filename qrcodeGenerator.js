@@ -19,4 +19,9 @@ function generateQRCode() {
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H // High error correction level
     });
+    
+    QRCode.toFile('qrcode.png', text, function (err) {
+        if (err) throw err;
+        console.log('QR code generated and saved as qrcode.png');
+    });
 }
